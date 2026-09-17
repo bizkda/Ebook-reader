@@ -56,13 +56,32 @@ export class PdfEngine implements ReaderEngine {
         for (const entry of entries) {
           const pageNum = Number((entry.target as HTMLElement).dataset.pageNum);
           if (entry.isIntersecting) {
-            this.currentPage = pageNum;
-            this.emitLocation();
             this.renderWindow(pageNum);
           }
         }
+        // Decide "current page" separately from render-triggering: pick the
+        // entry with the greatest visible area rather than requiring 50%
+        // visibility, since a zoomed page can be taller than the viewport
+        // and would then never cross a 0.5 threshold.
+        const mostVisible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (mostVisible) {
+          const pageNum = Number((mostVisible.target as HTMLElement).dataset.pageNum);
+          this.currentPage = pageNum;
+          this.emitLocation();
+        }
       },
-      { root: this.container, threshold: 0.5 }
+      {
+        root: this.container,
+        // Any sliver of a page entering view should trigger a render — at
+        // high zoom a page wrapper can be several times taller than the
+        // container, so a 50% threshold can never be satisfied.
+        threshold: 0,
+        // Start rendering slightly before pages reach the viewport so
+        // scrolling doesn't outrun the render window.
+        rootMargin: '50% 0px 50% 0px',
+      }
     );
     this.pageWrappers.forEach((el) => this.observer!.observe(el));
   }
@@ -115,6 +134,7 @@ export class PdfEngine implements ReaderEngine {
     if (!this.doc || !this.container) return;
     this.scale = scale;
     this.renderedPages.clear();
+    this.observer?.disconnect();
     this.container.innerHTML = '';
     this.pageWrappers = [];
     await this.buildPagePlaceholders();

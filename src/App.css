@@ -1,18 +1,61 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-canvas: #fbf4ec;
+  --color-surface-recessed: #f1eae3;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f5f5f5;
+  --color-divider: rgba(0,0,0,0.04);
+  --color-fg: #1a1a1a;
+  --color-fg-muted: #6e655e;
+  --color-primary: #ffad61;
+  --color-on-accent: #000000;
+  --color-accent-text: #8c5f35;
+  --color-secondary: #c95be0;
+  --color-accent-2-text: #a149b3;
+  --color-neutral-50: #fbf4ec;
+  --color-neutral-100: #ffffff;
+  --color-neutral-200: #e0dfdc;
+  --color-neutral-300: #c2bfbb;
+  --color-neutral-400: #a5a09a;
+  --color-neutral-500: #89827b;
+  --color-neutral-600: #6e655e;
+  --color-neutral-700: #4f4b46;
+  --color-neutral-800: #33322f;
+  --color-neutral-900: #1a1a1a;
+  --color-neutral-950: #171717;
+  --color-success: #149343;
+  --color-warning: #c36b05;
+  --color-error: #DC2626;
+  --color-data-1: #85049b;
+  --color-data-2: #9f2eb5;
+  --color-data-3: #b94bd0;
+  --color-data-4: #d365eb;
+  --color-data-5: #ea86ff;
+  --color-data-6: #f2b3ff;
+
+  /* Typography */
+  --font-display: "Source Serif 4", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Newsreader", ui-sans-serif, system-ui, sans-serif;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
-}
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  --gesso-duration-fast: 150ms;
+  --gesso-easing-default: ease-out;
+
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
 
-  color: #0f0f0f;
-  background-color: #f6f6f6;
+  color: var(--color-fg);
+  background-color: var(--color-canvas);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,96 +64,79 @@
   -webkit-text-size-adjust: 100%;
 }
 
-.container {
+body {
   margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
+/*
+  IMPORTANT: everything below is wrapped in @layer components.
+  Tailwind v4 puts its own utilities (hidden, md:hidden, flex, etc.)
+  inside cascade layers. Per the CSS spec, unlayered rules ALWAYS beat
+  layered rules, no matter source order or specificity. If these custom
+  classes are left unlayered, .iconbtn's `display: inline-flex` will
+  permanently override any `hidden` / `md:hidden` utility applied to
+  the same element — which is why elements meant to be responsive were
+  showing up on every breakpoint at once.
+*/
+@layer components {
+  /* Reader component classes */
+  .iconbtn {
+    width: 44px; height: 44px; border-radius: 9999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--color-surface); color: var(--color-fg);
+    transition: opacity var(--gesso-duration-fast) var(--gesso-easing-default),
+                transform var(--gesso-duration-fast) var(--gesso-easing-default);
+  }
+  .iconbtn:hover { opacity: 0.85; }
+  .iconbtn:active { transform: translateY(1px) scale(0.98); }
+  .iconbtn:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
 
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
+  .dropcap::first-letter {
+    font-family: var(--font-display);
+    font-size: 56px; line-height: 56px;
+    float: left; padding: 4px 8px 0 0; color: var(--color-fg);
   }
 
-  a:hover {
-    color: #24c8db;
+  .hl {
+    background: rgba(255,173,97,0.28);
+    border-radius: 6px 12px 8px 14px;
+    padding: 1px 4px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
+  .notebracket {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 24px; height: 24px; border-radius: 8px; margin: 0 2px;
+    font-size: 13px; line-height: 1;
+    background: color-mix(in srgb, var(--color-secondary) 12%, var(--color-surface));
+    color: var(--color-accent-2-text);
   }
-  button:active {
-    background-color: #0f0f0f69;
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-fg) 5%, transparent);
+    font-size: 13px; color: var(--color-fg); white-space: nowrap;
   }
+  .pill.solid { background: var(--color-secondary); color: #fff; }
+
+  .tools {
+    display: flex; justify-content: center; gap: 12px;
+    padding: 12px 16px; border-radius: 24px;
+    background: color-mix(in srgb, var(--color-canvas) 90%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
 }
