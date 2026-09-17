@@ -11,7 +11,6 @@ const engineRef = useRef<ReaderEngine | null>(null);
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const [location, setLocation] = useState<ReaderLocation | null>(null);
   const [loading, setLoading] = useState(true);
-  const [zoom, setZoomState] = useState(1.2); // matches PdfEngine's default scale
 
   useEffect(() => {
   if (!container) return;
@@ -68,13 +67,37 @@ const engineRef = useRef<ReaderEngine | null>(null);
     setContainer(el);
   }, []);
 
-    const setZoom = useCallback((scale: number) => {
-    const engine = engineRef.current;
-    if (engine instanceof PdfEngine) {
-      engine.setZoom(scale);
-      setZoomState(scale);
-    }
+  const [zoom, setZoomState] = useState(1.2);
+
+  const setZoom = useCallback((scale: number) => {
+  const engine = engineRef.current;
+  if (engine instanceof PdfEngine) {
+    engine.setZoom(scale);
+    setZoomState(scale);
+  } else if (engine instanceof EpubEngine) {
+    engine.setZoom(scale);
+    setZoomState(scale);
+  }
+}, []);
+
+  const nextPage = useCallback(() => {
+    void engineRef.current?.nextPage();
   }, []);
 
-  return { attachContainer, location, loading, zoom, setZoom, isPdf: book.format === 'pdf' };
+  const prevPage = useCallback(() => {
+    void engineRef.current?.prevPage();
+  }, []);
+  const [darkMode, setDarkModeState] = useState(false);
+  const setDarkMode = useCallback((enabled: boolean) => {
+    engineRef.current?.setDarkMode(enabled);
+    setDarkModeState(enabled);
+  }, []);
+
+  const [temperature, setTemperature] = useState(0); // 0–100, warmth only
+
+  return {
+    attachContainer, location, loading, zoom, setZoom, nextPage, prevPage,
+    darkMode, setDarkMode, temperature, setTemperature,
+    isPdf: book.format === 'pdf',isEpub: book.format ==='epub'
+  }
 }

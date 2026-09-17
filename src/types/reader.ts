@@ -10,5 +10,9 @@ export interface ReaderEngine {
   goToLocation(loc: Partial<ReaderLocation>): Promise<void>;
   getCurrentLocation(): ReaderLocation;
   onLocationChange(cb: (loc: ReaderLocation) => void): void;
-  destroy(): void;
+  setZoom(scale: number): Promise<void>;
+  setDarkMode(enabled: boolean): Promise<void>;
+  nextPage(): Promise<void>;
+  prevPage(): Promise<void>;
+  destroy(): Promise<void>;
 }

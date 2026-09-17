@@ -33,7 +33,8 @@ export class PdfEngine implements ReaderEngine {
 
   private async buildPagePlaceholders() {
     if (!this.doc || !this.container) return;
-    const firstPage = await this.doc.getPage(1);
+    const refPageNum = Math.min(3, this.doc.numPages);
+    const firstPage = await this.doc.getPage(refPageNum);
     const viewport = firstPage.getViewport({ scale: this.scale });
 
     for (let i = 1; i <= this.doc.numPages; i++) {
@@ -86,15 +87,21 @@ export class PdfEngine implements ReaderEngine {
     const viewport = page.getViewport({ scale: this.scale });
     const wrapper = this.pageWrappers[pageNum - 1];
 
+    const outputScale = window.devicePixelRatio || 1;
+
     const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
+    canvas.width = Math.floor(viewport.width * outputScale);
+    canvas.height = Math.floor(viewport.height * outputScale);
+    canvas.style.width = `${viewport.width}px`;
+    canvas.style.height = `${viewport.height}px`;
     canvas.style.position = 'absolute';
     canvas.style.inset = '0';
     wrapper.appendChild(canvas);
 
     const ctx = canvas.getContext('2d')!;
-    await page.render({ canvasContext: ctx, viewport ,canvas}).promise;
+    const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : undefined;
+
+    await page.render({ canvasContext: ctx, viewport, transform , canvas }).promise;
     this.renderedPages.add(pageNum);
   }
 
@@ -133,6 +140,22 @@ export class PdfEngine implements ReaderEngine {
 
   private emitLocation() {
     this.locationCb?.(this.getCurrentLocation());
+  }
+  
+  async setDarkMode(enabled: boolean) {
+  if (!this.container) return;
+  this.container.style.filter = enabled ? 'invert(0.9) hue-rotate(180deg)' : '';
+}
+
+  async nextPage() {
+  if (!this.doc) return;
+  const target = Math.min(this.doc.numPages, this.currentPage + 1);
+  await this.goToLocation({ page: target });
+}
+
+  async prevPage() {
+    const target = Math.max(1, this.currentPage - 1);
+    await this.goToLocation({ page: target });
   }
 
   async destroy() {
