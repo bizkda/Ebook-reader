@@ -3,6 +3,8 @@ import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import { ReaderEngine, ReaderLocation } from '../../types/reader';
 import { readFile } from '@tauri-apps/plugin-fs';
+import { TextLayer } from 'pdfjs-dist';
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url

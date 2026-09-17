@@ -1,0 +1,18 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "Capability for the main window on mobile",
+  "windows": ["main"],
+  "platforms": ["android", "iOS"],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "fs:default",
+    "fs:allow-read-file",
+    "dialog:default",
+    "dialog:allow-open",
+    "fs:allow-app-write",
+    "fs:allow-app-write-recursive",
+    "fs:allow-copy-file"
+  ]
+}

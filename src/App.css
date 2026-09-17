@@ -74,6 +74,36 @@ h1, h2, h3 {
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
+.textLayer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  line-height: 1;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+}
+
+.textLayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.textLayer ::selection {
+  background: rgba(0, 100, 255, 0.25);
+}
+
+.textLayer span.markedContent {
+  top: 0;
+  height: 0;
+}
+
+.textLayer br::selection {
+  background: transparent;
+}
 
 /*
   IMPORTANT: everything below is wrapped in @layer components.
