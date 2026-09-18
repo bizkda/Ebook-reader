@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useReaderViewModel } from '../../viewmodels/useReaderViewModel';
 import { Book } from '../../services/BookService';
 
@@ -11,9 +11,8 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
   const {
     attachContainer, loading, isPdf, zoom, setZoom, nextPage, prevPage,
     darkMode, setDarkMode, temperature, setTemperature,
-  } = useReaderViewModel(book);
+  contentClickTick} = useReaderViewModel(book);
 
-  const [controlsVisible, setControlsVisible] = useState(true);
 
   const ZOOM_STEP = 0.1;
   const MIN_ZOOM = 0.5;
@@ -31,7 +30,16 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
     }
     setZoomDraft(null);
   };
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const isFirstClick = useRef(true);
 
+  useEffect(() => {
+    if (isFirstClick.current) {
+      isFirstClick.current = false;
+      return;
+    }
+    setControlsVisible((v) => !v);
+  }, [contentClickTick]);
   return (
     <div
       className="relative h-screen w-full overflow-hidden"

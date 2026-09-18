@@ -11,15 +11,14 @@ const engineRef = useRef<ReaderEngine | null>(null);
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const [location, setLocation] = useState<ReaderLocation | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [contentClickTick, setContentClickTick] = useState(0);
   useEffect(() => {
   if (!container) return;
   const node = container; // freshly typed as HTMLElement, not narrowed-and-forgettable
   let cancelled = false;
 
   async function init() {
-    const engine = book.format === 'pdf' ? new PdfEngine() : new EpubEngine();
-
+    const engine: ReaderEngine = book.format === 'pdf' ? new PdfEngine() : new EpubEngine();
     const saved = await invoke<{ current_page: number; current_cfi: string | null } | null>(
       'get_progress',
       { bookId: book.id }
@@ -32,7 +31,7 @@ const engineRef = useRef<ReaderEngine | null>(null);
       return;
     }
     engineRef.current = engine;
-
+    engine.onContentClick?.(() => setContentClickTick((t) => t + 1));
     if (saved) {
       await engine.goToLocation({ page: saved.current_page, cfi: saved.current_cfi ?? undefined });
       if (cancelled) return;
@@ -96,8 +95,8 @@ const engineRef = useRef<ReaderEngine | null>(null);
   const [temperature, setTemperature] = useState(0); // 0–100, warmth only
 
   return {
-    attachContainer, location, loading, zoom, setZoom, nextPage, prevPage,
-    darkMode, setDarkMode, temperature, setTemperature,
-    isPdf: book.format === 'pdf',isEpub: book.format ==='epub'
-  }
+  attachContainer, location, loading, zoom, setZoom, nextPage, prevPage,
+  darkMode, setDarkMode, temperature, setTemperature, contentClickTick,
+  isPdf: book.format === 'pdf', isEpub: book.format === 'epub'
+}
 }

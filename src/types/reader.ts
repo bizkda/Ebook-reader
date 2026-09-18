@@ -12,6 +12,7 @@ export interface ReaderEngine {
   onLocationChange(cb: (loc: ReaderLocation) => void): void;
   setZoom(scale: number): Promise<void>;
   setDarkMode(enabled: boolean): Promise<void>;
+  onContentClick?(cb: () => void): void;
   nextPage(): Promise<void>;
   prevPage(): Promise<void>;
   destroy(): Promise<void>;

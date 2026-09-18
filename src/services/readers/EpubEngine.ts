@@ -7,6 +7,7 @@ export class EpubEngine implements ReaderEngine {
   private book: Book | null = null;
   private rendition: Rendition | null = null;
   private locationCb: ((loc: ReaderLocation) => void) | null = null;
+  private contentClickCb: (() => void) | null = null; // add this
 
   async load(filePath: string, container: HTMLElement) {
     const bytes = await readFile(filePath);
@@ -14,7 +15,9 @@ export class EpubEngine implements ReaderEngine {
     this.rendition = this.book.renderTo(container, {
       width: '100%',
       height: '100%',
-      flow: 'scrolled-doc', // was 'paginated'
+      flow: 'scrolled-doc',
+      allowScriptedContent: true, // adds allow-scripts to the iframe sandbox
+
     });
     await this.rendition.display();
 
@@ -25,8 +28,16 @@ export class EpubEngine implements ReaderEngine {
         percentage: location.start.percentage ?? 0,
       });
     });
+
+    // forward clicks inside the content iframe to the outside world
+    this.rendition.on('click', () => {
+      this.contentClickCb?.();
+    });
   }
 
+  onContentClick(cb: () => void) {
+    this.contentClickCb = cb;
+  }
 // nextPage/prevPage unchanged — rendition.next()/.prev() now advance by chapter, not page
 
   async goToLocation(loc: Partial<ReaderLocation>) {
@@ -70,4 +81,6 @@ export class EpubEngine implements ReaderEngine {
     this.rendition?.destroy();
     this.book?.destroy();
   }
+  
+
 }
