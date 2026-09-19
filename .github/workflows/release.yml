@@ -25,7 +25,8 @@ jobs:
           java-version: 21
 
       - uses: android-actions/setup-android@v3
-
+        with:
+            packages: platform-tools
       - name: Install NDK
         run: sdkmanager --install "ndk;27.0.12077973"
 
@@ -69,7 +70,8 @@ jobs:
 
       - run: npm install
 
-      - run: npm install -g @tauri-apps/cli
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2.0.0"
 
       - run: cargo tauri build
 
@@ -78,6 +80,7 @@ jobs:
           files: src-tauri/target/release/bundle/msi/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
   build-macos:
     runs-on: macos-latest
@@ -94,7 +97,8 @@ jobs:
 
       - run: npm install
 
-      - run: npm install -g @tauri-apps/cli
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2.0.0"
 
       - run: cargo tauri build --target universal-apple-darwin
 
@@ -103,6 +107,9 @@ jobs:
           files: src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+          
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -121,7 +128,8 @@ jobs:
 
       - run: npm install
 
-      - run: npm install -g @tauri-apps/cli
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2.0.0"
 
       - run: cargo tauri build
 
