@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*"
+permissions:
+  contents: write
 
 jobs:
   build-android:
@@ -109,7 +111,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-          
+
   build-linux:
     runs-on: ubuntu-latest
     steps:
