@@ -82,3 +82,29 @@ pub fn list_recently_read(state: State<DbState>, limit: i64) -> Result<Vec<Readi
 
     rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
 }
+// add to src-tauri/src/commands/progress.rs
+#[tauri::command]
+pub fn list_all_progress(state: State<DbState>) -> Result<Vec<ReadingProgress>, String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let mut stmt = conn
+        .prepare(
+            "SELECT book_id, current_page, current_cfi, percentage, last_read_at, updated_at
+             FROM reading_progress",
+        )
+        .map_err(|e| e.to_string())?;
+
+    let rows = stmt
+        .query_map([], |row| {
+            Ok(ReadingProgress {
+                book_id: row.get(0)?,
+                current_page: row.get(1)?,
+                current_cfi: row.get(2)?,
+                percentage: row.get(3)?,
+                last_read_at: row.get(4)?,
+                updated_at: row.get(5)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+}

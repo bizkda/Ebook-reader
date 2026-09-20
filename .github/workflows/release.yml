@@ -8,61 +8,6 @@ permissions:
   contents: write
 
 jobs:
-  build-android:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - uses: android-actions/setup-android@v3
-        with:
-            packages: platform-tools
-      - name: Install NDK
-        run: sdkmanager --install "ndk;27.0.12077973"
-
-      - name: Install npm dependencies
-        run: npm install
-
-      - name: Decode keystore
-        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > release.jks
-      - name: Debug keystore
-        run: |
-            ls -la release.jks
-            file release.jks
-            keytool -list -v -keystore release.jks -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" || echo "keytool failed here"
-      - name: Create keystore.properties
-        run: |
-          cat > src-tauri/gen/android/keystore.properties << EOF
-          password=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-          storeFile=${{ github.workspace }}/release.jks
-          EOF
-
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version "^2.0.0"
-
-      - name: Build Android release
-        run: cargo tauri android build --split-per-abi
-
-      - name: Upload APKs to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: src-tauri/gen/android/app/build/outputs/apk/**/release/*.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   build-windows:
     runs-on: windows-latest
     steps:
