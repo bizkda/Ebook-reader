@@ -66,7 +66,7 @@ const engineRef = useRef<ReaderEngine | null>(null);
     setContainer(el);
   }, []);
 
-  const [zoom, setZoomState] = useState(1.2);
+  const [zoom, setZoomState] = useState(0.8);
 
   const setZoom = useCallback((scale: number) => {
   const engine = engineRef.current;

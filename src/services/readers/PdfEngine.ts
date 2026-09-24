@@ -28,6 +28,8 @@ export class PdfEngine implements ReaderEngine {
   // the in-flight render knows it is stale and stops touching the DOM.
   private pageTokens = new Map<number, symbol>();
 
+  
+
   // Clears the "selecting" flag that keeps selection from jumping across pages
   private onMouseUp = () => {
     this.container
