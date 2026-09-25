@@ -3,6 +3,7 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { ReaderView } from './views/Reader/ReaderView';
 import { Book, getAllBooks, importAndAddBook, removeBook } from './services/BookService';
 import { listProgress } from './services/ProgressService';
+import { checkForUpdate, downloadUpdate, UpdateInfo } from './services/update/UpdateChecker';
 import './App.css';
 
 function App() {
@@ -12,6 +13,8 @@ function App() {
   const [importing, setImporting] = useState(false);
   const [query, setQuery] = useState('');
   const [progressById, setProgressById] = useState<Record<string, number>>({});
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +50,16 @@ function App() {
       // leave progressById as {} — rows just show "—"
     });
 
+    checkForUpdate()
+      .then((info) => {
+        if (cancelled) return;
+        if (info.available) setUpdateInfo(info);
+      })
+      .catch((err) => {
+        // Non-fatal — offline, rate-limited, API down, etc. Just skip the banner.
+        console.error('Update check failed:', err);
+      });
+
     return () => {
       cancelled = true;
     };
@@ -65,6 +78,12 @@ function App() {
   async function handleRemove(id: string) {
     await removeBook(id);
     setBooks((prev) => prev.filter((b) => b.id !== id));
+  }
+
+  async function handleUpdateClick() {
+    if (updateInfo?.apkUrl) {
+      await downloadUpdate(updateInfo.apkUrl);
+    }
   }
 
   if (activeBook) {
@@ -90,6 +109,32 @@ function App() {
       }}
     >
       <div className="mx-auto flex w-full max-w-[640px] flex-col gap-6 px-4 pb-10 pt-12 md:max-w-[720px] md:gap-8 md:px-0 md:pt-16">
+        {/* Update banner */}
+        {updateInfo && !updateDismissed && (
+          <div
+            className="flex items-center justify-between gap-3 rounded-md px-4 py-3 text-[13px] md:rounded-lg md:text-[15px]"
+            style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-primary)' }}
+            role="status"
+          >
+            <span>
+              Version <strong>{updateInfo.latestVersion}</strong> is available (you have{' '}
+              {updateInfo.currentVersion}).
+            </span>
+            <span className="flex shrink-0 items-center gap-2">
+              <button className="pill solid" onClick={handleUpdateClick} disabled={!updateInfo.apkUrl}>
+                Update
+              </button>
+              <button
+                className="icon-btn"
+                onClick={() => setUpdateDismissed(true)}
+                aria-label="Dismiss update notice"
+              >
+                ✕
+              </button>
+            </span>
+          </div>
+        )}
+
         {/* Header */}
         <header className="lib-head">
           <div className="min-w-0">
