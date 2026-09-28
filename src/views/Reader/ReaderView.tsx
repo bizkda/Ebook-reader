@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReaderViewModel } from '../../viewmodels/useReaderViewModel';
 import { Book } from '../../services/BookService';
+import { usePinchZoom } from '../../hooks/usePinchZoom';
+import { ZoomResetIcon } from '../../components/ZoomResetIcon';
 
 interface ReaderViewProps {
   book: Book;
@@ -32,7 +34,24 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
   };
   const [controlsVisible, setControlsVisible] = useState(true);
   const isFirstClick = useRef(true);
+  const viewerRef = useRef<HTMLDivElement>(null);
+  usePinchZoom(viewerRef, zoom, setZoom, MIN_ZOOM, MAX_ZOOM);
+  const animRef = useRef(0);
 
+  const animateZoomTo = (target: number) => {
+    cancelAnimationFrame(animRef.current);
+    const from = zoom;
+    const start = performance.now();
+    const duration = 250; // ms
+
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out, feels like a natural glide
+      setZoom(from + (target - from) * eased);
+      if (t < 1) animRef.current = requestAnimationFrame(step);
+    };
+    animRef.current = requestAnimationFrame(step);
+  };
   useEffect(() => {
     if (isFirstClick.current) {
       isFirstClick.current = false;
@@ -50,7 +69,13 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
       }}
     >
       {/* Full-bleed reader surface, always full window */}
-      <div className="absolute inset-0" onClick={toggleControls}>
+      {/* Full-bleed reader surface, always full window */}
+      <div
+        ref={viewerRef}
+        className="absolute inset-0"
+        style={{ touchAction: 'pan-x pan-y' }}
+        onClick={toggleControls}
+      >
         {loading && <div className="p-4 text-fg-muted">Loading…</div>}
         <div ref={attachContainer} className="h-full w-full overflow-auto" />
         <div
@@ -208,7 +233,15 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           >
             +
           </button>
-
+          <button
+  className="iconbtn disabled:cursor-not-allowed disabled:opacity-40"
+  disabled={Math.round(zoom * 100) === 100}
+  onClick={() => setZoom(1)}
+  aria-label="Reset zoom to 100%"
+  title="Reset zoom (Ctrl+0)"
+>
+  <ZoomResetIcon />
+</button>
           <button className="iconbtn md:hidden" onClick={nextPage} aria-label={isPdf ? 'Next page' : 'Next chapter'}>
             ›
           </button>
