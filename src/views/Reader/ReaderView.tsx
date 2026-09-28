@@ -234,11 +234,10 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
             +
           </button>
           <button
-  className="iconbtn disabled:cursor-not-allowed disabled:opacity-40"
-  disabled={Math.round(zoom * 100) === 100}
-  onClick={() => setZoom(1)}
-  aria-label="Reset zoom to 100%"
-  title="Reset zoom (Ctrl+0)"
+  className="iconbtn"
+  onClick={() => animateZoomTo(zoom > 1.05 ? 1 : 2)}
+  aria-label="Toggle zoom"
+  title="Zoom in / back to 100%"
 >
   <ZoomResetIcon />
 </button>
