@@ -1,10 +1,10 @@
 // src/viewmodels/useReaderViewModel.ts
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { invoke } from '@tauri-apps/api/core';
 import { PdfEngine } from '../services/readers/PdfEngine';
 import { EpubEngine } from '../services/readers/EpubEngine';
 import { ReaderEngine, ReaderLocation } from '../types/reader';
 import { Book } from '../services/BookService';
+import { getProgress, updateProgress } from '../services/ProgressService';
 
 export function useReaderViewModel(book: Book) {
 const engineRef = useRef<ReaderEngine | null>(null);
@@ -17,12 +17,11 @@ const engineRef = useRef<ReaderEngine | null>(null);
   const node = container; // freshly typed as HTMLElement, not narrowed-and-forgettable
   let cancelled = false;
 
-  async function init() {
+  
+
+    async function init() {
     const engine: ReaderEngine = book.format === 'pdf' ? new PdfEngine() : new EpubEngine();
-    const saved = await invoke<{ current_page: number; current_cfi: string | null } | null>(
-      'get_progress',
-      { bookId: book.id }
-    );
+    const saved = await getProgress(book.id);
     if (cancelled) return;
 
     await engine.load(book.file_path, node);
@@ -39,14 +38,12 @@ const engineRef = useRef<ReaderEngine | null>(null);
 
     engine.onLocationChange((loc) => {
       setLocation(loc);
-      invoke('upsert_progress', {
-        update: {
-          book_id: book.id,
-          current_page: loc.page,
-          current_cfi: loc.cfi ?? null,
-          percentage: loc.percentage,
-        },
-      });
+      updateProgress({
+        book_id: book.id,
+        current_page: loc.page,
+        current_cfi: loc.cfi ?? null,
+        percentage: loc.percentage,
+      }).catch((err) => console.error('Failed to save progress', err));
     });
 
     setLoading(false);

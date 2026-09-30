@@ -18,7 +18,7 @@ pub fn upsert_progress(state: State<DbState>, update: UpdateProgress) -> Result<
             percentage = ?4,
             last_read_at = ?5,
             updated_at = ?5",
-        params![update.book_id, update.current_page, update.current_cfi, update.percentage, now],
+        params![update.book_id, update.current_page , update.current_cfi, update.percentage, now],
     )
     .map_err(|e| e.to_string())?;
 

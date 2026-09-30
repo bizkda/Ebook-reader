@@ -41,6 +41,7 @@ export async function getProgress(bookId: string): Promise<ReadingProgress | nul
  * and returning the saved ReadingProgress. Call this from ReaderView as
  * the reader moves through pages/CFIs.
  */
+// src/services/ProgressService.ts
 export async function updateProgress(progress: UpdateProgress): Promise<ReadingProgress> {
-  return await invoke<ReadingProgress>('update_progress', { progress });
+  return await invoke<ReadingProgress>('upsert_progress', { update: progress });
 }
