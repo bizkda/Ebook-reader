@@ -17,7 +17,6 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
     darkMode, setDarkMode, temperature, setTemperature,
     contentClickTick, currentPage, currentCfi, goToBookmark,
   } = useReaderViewModel(book);
-
   const [showBookmarks, setShowBookmarks] = useState(false);
   const ZOOM_STEP = 0.1;
   const MIN_ZOOM = 0.5;
@@ -112,9 +111,10 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
             <span className="block truncate text-[13px] uppercase tracking-[0.08em] text-fg-muted">
               {book.title}
             </span>
-            <span className="font-display text-[17px] leading-[22px] md:text-[22px] md:leading-[26px]">
-              Chapter
+             <span className="font-display text-[17px] leading-[22px] md:text-[22px] md:leading-[26px]">
+              page {currentPage}
             </span>
+           
           </div>
         </div>
 
@@ -190,7 +190,9 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           background: 'linear-gradient(to top, rgba(0,0,0,0.35), transparent)',
         }}
       >
+        
         <div className={`tools mx-auto rounded-full bg-black/20 backdrop-blur-md md:gap-3 ${controlsVisible ? 'pointer-events-auto' : ''}`}>
+          
           <button className="iconbtn md:hidden" onClick={prevPage} aria-label={isPdf ? 'Prev page' : 'Prev chapter'}>
             ‹
           </button>
