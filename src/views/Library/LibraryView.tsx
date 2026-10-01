@@ -1,12 +1,17 @@
 // src/views/Library/LibraryView.tsx
 import { convertFileSrc } from '@tauri-apps/api/core';
 import type { useLibraryViewModel } from '../../viewmodels/useLibraryViewModel';
+import { Icon } from '../../components/Icon';
+import { IconButton } from '../../components/IconButton';
+import { Button } from '../../components/Button';
+import { CloseIcon } from '../../components/icons';
 
 type Props = { library: ReturnType<typeof useLibraryViewModel> };
 
+
 export function LibraryView({ library }: Props) {
   const term = library.query.trim();
- return (
+  return (
     <main
       className="min-h-screen w-full"
       style={{
@@ -28,20 +33,20 @@ export function LibraryView({ library }: Props) {
               {library.updateInfo.currentVersion}).
             </span>
             <span className="flex shrink-0 items-center gap-2">
-              <button
-                className="pill solid"
+              <Button
+                size="sm"
                 onClick={library.installUpdate}
                 disabled={!library.updateInfo.apkUrl}
               >
                 Update
-              </button>
-              <button
-                className="icon-btn"
+              </Button>
+              <IconButton
+                size="sm"
                 onClick={library.dismissUpdate}
                 aria-label="Dismiss update notice"
               >
-                ✕
-              </button>
+                <CloseIcon />
+              </IconButton>
             </span>
           </div>
         )}
@@ -59,20 +64,10 @@ export function LibraryView({ library }: Props) {
         {/* Search + import */}
         <section className="search-row" aria-label="Search and import">
           <div className="search-well">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="ic"
-              style={{ color: 'var(--color-fg-muted)', width: 20, height: 20 }}
-              aria-hidden="true"
-            >
+            <Icon className="ic text-fg-muted">
               <path d="m21 21l-4.34-4.34" />
               <circle cx="11" cy="11" r="8" />
-            </svg>
+            </Icon>
             <input
               type="search"
               value={library.query}
@@ -81,26 +76,16 @@ export function LibraryView({ library }: Props) {
               aria-label="Search library"
             />
           </div>
-          <button
-            className="icon-btn"
+          <IconButton
             onClick={library.importBook}
             disabled={library.importing}
             aria-label="Import books"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ width: 22, height: 22 }}
-              aria-hidden="true"
-            >
+            <Icon size={22}>
               <path d="M12 3v12m-4-4l4 4l4-4" />
               <path d="M8 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-4" />
-            </svg>
-          </button>
+            </Icon>
+          </IconButton>
         </section>
 
         {/* Shelf */}
@@ -115,9 +100,9 @@ export function LibraryView({ library }: Props) {
             <p className="max-w-[420px] text-[13px] text-fg-muted md:text-[15px]">
               Import an EPUB or PDF and it will show up here, ready to open in the reader.
             </p>
-            <button className="pill solid" onClick={library.importBook} disabled={library.importing}>
+            <Button onClick={library.importBook} disabled={library.importing}>
               {library.importing ? 'Importing…' : 'Add a book'}
-            </button>
+            </Button>
           </div>
         ) : (
           <>
@@ -161,13 +146,13 @@ export function LibraryView({ library }: Props) {
                           {pct !== undefined ? `${Math.round(pct * 100)}%` : '—'}
                         </span>
                       </button>
-                      <button
-                        className="icon-btn book-remove"
+                      <IconButton
+                        className="book-remove"
                         onClick={() => library.removeBook(book.id)}
                         aria-label={`Remove ${book.title}`}
                       >
-                        ✕
-                      </button>
+                        <CloseIcon />
+                      </IconButton>
                     </div>
                   );
                 })}
@@ -177,17 +162,9 @@ export function LibraryView({ library }: Props) {
             {/* Import row */}
             <button className="import-row" onClick={library.importBook} disabled={library.importing}>
               <span className="book-cover book-cover--dashed" aria-hidden="true">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ width: 20, height: 20, color: 'var(--color-fg-muted)' }}
-                >
+                <Icon className="text-fg-muted">
                   <path d="M5 12h14m-7-7v14" />
-                </svg>
+                </Icon>
               </span>
               <span className="book-text">
                 <span className="book-title">

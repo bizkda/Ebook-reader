@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Bookmark } from '../../services/BookmarkService';
 import { useBookmarkViewModel } from '../../viewmodels/useBookmarkViewModel';
+import { Icon } from '../../components/Icon';
+import { IconButton } from '../../components/IconButton';
+import { Button } from '../../components/Button';
 
 interface BookmarkViewProps {
   bookId: string;
@@ -9,25 +12,6 @@ interface BookmarkViewProps {
   onSelect?: (bookmark: Bookmark) => void;
   onClose?: () => void;
 }
-
-const Icon = ({ children }: { children: React.ReactNode }) => (
-  <svg
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    {children}
-  </svg>
-);
-
-const iconBtn =
-  'inline-flex shrink-0 items-center justify-center rounded-full bg-white text-[#6d6965] transition hover:opacity-85 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1a1a1a]';
 
 export function BookmarkView({
   bookId,
@@ -84,12 +68,12 @@ export function BookmarkView({
         <h1 className="font-display text-[34px] font-medium leading-[36px] tracking-[-0.02em]">
           Bookmarks
         </h1>
-        <button className={`${iconBtn} h-10 w-10`} onClick={onClose} aria-label="Close bookmarks">
+        <IconButton onClick={onClose} aria-label="Close bookmarks">
           <Icon>
             <path d="M18 6 6 18" />
             <path d="m6 6 12 12" />
           </Icon>
-        </button>
+        </IconButton>
       </header>
 
       {/* Search well */}
@@ -142,17 +126,13 @@ export function BookmarkView({
           className="resize-none rounded-[16px] bg-[#edeae5] px-5 py-3 text-[16px] text-[#1a1a1a] outline-none placeholder:text-[#6d6965] focus:outline focus:outline-2 focus:outline-black/[0.06]"
         />
 
-        <button
-          onClick={handleAdd}
-          disabled={page === null || saving}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#f3c9a0] px-6 py-4 text-[16px] font-medium text-black shadow-[0_6px_16px_rgba(26,26,26,0.12)] transition hover:-translate-y-px active:translate-y-px active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1a1a1a] disabled:opacity-50"
-        >
+        <Button onClick={handleAdd} disabled={page === null || saving}>
           <Icon>
             <path d="M5 12h14" />
             <path d="M12 5v14" />
           </Icon>
           {saving ? 'Saving…' : 'Add bookmark'}
-        </button>
+        </Button>
       </section>
 
       {/* Dateline */}
@@ -195,8 +175,8 @@ export function BookmarkView({
                   </span>
                 </span>
               </button>
-              <button
-                className={`${iconBtn} h-9 w-9`}
+              <IconButton
+                size="sm"
                 onClick={() => removeBookmark(bookmark.id)}
                 aria-label="Delete bookmark"
               >
@@ -205,7 +185,7 @@ export function BookmarkView({
                   <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
                   <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                 </Icon>
-              </button>
+              </IconButton>
             </div>
           ))
         )}

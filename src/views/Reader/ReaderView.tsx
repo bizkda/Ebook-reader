@@ -3,6 +3,18 @@ import { useReaderViewModel } from '../../viewmodels/useReaderViewModel';
 import { Book } from '../../services/BookService';
 import { usePinchZoom } from '../../hooks/usePinchZoom';
 import { ZoomResetIcon } from '../../components/ZoomResetIcon';
+import { IconButton } from '../../components/IconButton';
+import {
+  ArrowLeftIcon,
+  BookmarkIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MinusIcon,
+  MoonIcon,
+  PlusIcon,
+  SunIcon,
+  ThermometerIcon,
+} from '../../components/icons';
 import { BookmarkView } from '../Bookmarks/Bookmark';
 import { Bookmark } from '../../services/BookmarkService';
 
@@ -100,28 +112,28 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
         }}
       >
         <div className={`flex min-w-0 items-center gap-3 pb-4 md:gap-4 ${controlsVisible ? 'pointer-events-auto' : ''}`}>
-          <button
-            className="iconbtn hidden shrink-0 backdrop-blur-md md:inline-flex"
+          <IconButton
+            variant="reader"
+            className="hidden shrink-0 backdrop-blur-md md:inline-flex"
             onClick={onClose}
             aria-label="Back to library"
           >
-            ←
-          </button>
+            <ArrowLeftIcon />
+          </IconButton>
           <div className="flex min-w-0 flex-col gap-1">
             <span className="block truncate text-[13px] uppercase tracking-[0.08em] text-fg-muted">
               {book.title}
             </span>
-             <span className="font-display text-[17px] leading-[22px] md:text-[22px] md:leading-[26px]">
+            <span className="font-display text-[17px] leading-[22px] md:text-[22px] md:leading-[26px]">
               page {currentPage}
             </span>
-           
           </div>
         </div>
 
         <div className={`flex shrink-0 items-center gap-2 pb-4 md:gap-4 ${controlsVisible ? 'pointer-events-auto' : ''}`}>
           <div className="hidden items-center gap-3 md:flex">
             <label className="flex items-center gap-2 rounded-full bg-black/20 px-3 py-1.5 text-fg-muted backdrop-blur-md">
-              🌡️
+              <ThermometerIcon />
               <input
                 type="range"
                 min={0}
@@ -135,29 +147,37 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
             <span className="pill backdrop-blur-md">{Math.round(zoom * 100)}%</span>
           </div>
 
-          <button className="iconbtn backdrop-blur-md md:hidden" onClick={onClose} aria-label="Back to library">
-            ←
-          </button>
-          <button
-            className="iconbtn backdrop-blur-md"
+          <IconButton
+            variant="reader"
+            className="backdrop-blur-md md:hidden"
+            onClick={onClose}
+            aria-label="Back to library"
+          >
+            <ArrowLeftIcon />
+          </IconButton>
+          <IconButton
+            variant="reader"
+            className="backdrop-blur-md"
             onClick={() => setDarkMode(!darkMode)}
             aria-label="Toggle dark mode"
           >
-            {darkMode ? '☀️' : '🌙'}
-          </button>
-          <button
-            className="iconbtn backdrop-blur-md"
+            {darkMode ? <SunIcon /> : <MoonIcon />}
+          </IconButton>
+          <IconButton
+            variant="reader"
+            className="backdrop-blur-md"
             onClick={() => setShowBookmarks((s) => !s)}
             aria-label="Bookmarks"
           >
-            🔖
-          </button>
+            <BookmarkIcon />
+          </IconButton>
         </div>
       </div>
 
       {/* Desktop page-turn rails — floating over the page */}
-      <button
-        className={`iconbtn pointer-events-auto absolute left-4 top-1/2 hidden -translate-y-1/2 backdrop-blur-md transition-opacity duration-200 md:inline-flex ${
+      <IconButton
+        variant="reader"
+        className={`pointer-events-auto absolute left-4 top-1/2 hidden -translate-y-1/2 backdrop-blur-md transition-opacity duration-200 md:inline-flex ${
           controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={(e) => {
@@ -166,10 +186,11 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
         }}
         aria-label={isPdf ? 'Prev page' : 'Prev chapter'}
       >
-        ‹
-      </button>
-      <button
-        className={`iconbtn pointer-events-auto absolute right-4 top-1/2 hidden -translate-y-1/2 backdrop-blur-md transition-opacity duration-200 md:inline-flex ${
+        <ChevronLeftIcon />
+      </IconButton>
+      <IconButton
+        variant="reader"
+        className={`pointer-events-auto absolute right-4 top-1/2 hidden -translate-y-1/2 backdrop-blur-md transition-opacity duration-200 md:inline-flex ${
           controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={(e) => {
@@ -178,8 +199,8 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
         }}
         aria-label={isPdf ? 'Next page' : 'Next chapter'}
       >
-        ›
-      </button>
+        <ChevronRightIcon />
+      </IconButton>
 
       {/* Bottom chrome — floating, transparent, fades in/out */}
       <div
@@ -190,19 +211,22 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           background: 'linear-gradient(to top, rgba(0,0,0,0.35), transparent)',
         }}
       >
-        
         <div className={`tools mx-auto rounded-full bg-black/20 backdrop-blur-md md:gap-3 ${controlsVisible ? 'pointer-events-auto' : ''}`}>
-          
-          <button className="iconbtn md:hidden" onClick={prevPage} aria-label={isPdf ? 'Prev page' : 'Prev chapter'}>
-            ‹
-          </button>
-          <button
-            className="iconbtn"
+          <IconButton
+            variant="reader"
+            className="md:hidden"
+            onClick={prevPage}
+            aria-label={isPdf ? 'Prev page' : 'Prev chapter'}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+          <IconButton
+            variant="reader"
             onClick={() => setZoom(Math.max(MIN_ZOOM, zoom - ZOOM_STEP))}
             aria-label="Zoom out"
           >
-            −
-          </button>
+            <MinusIcon />
+          </IconButton>
 
           <input
             type="number"
@@ -239,29 +263,34 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
             "
           />
 
-          <button
-            className="iconbtn"
+          <IconButton
+            variant="reader"
             onClick={() => setZoom(Math.min(MAX_ZOOM, zoom + ZOOM_STEP))}
             aria-label="Zoom in"
           >
-            +
-          </button>
-          <button
-            className="iconbtn"
+            <PlusIcon />
+          </IconButton>
+          <IconButton
+            variant="reader"
             onClick={() => animateZoomTo(zoom > 1.05 ? 1 : 2)}
             aria-label="Toggle zoom"
             title="Zoom in / back to 100%"
           >
             <ZoomResetIcon />
-          </button>
-          <button className="iconbtn md:hidden" onClick={nextPage} aria-label={isPdf ? 'Next page' : 'Next chapter'}>
-            ›
-          </button>
+          </IconButton>
+          <IconButton
+            variant="reader"
+            className="md:hidden"
+            onClick={nextPage}
+            aria-label={isPdf ? 'Next page' : 'Next chapter'}
+          >
+            <ChevronRightIcon />
+          </IconButton>
         </div>
 
         {/* Phone-only warmth slider */}
         <label className={`flex items-center gap-2 rounded-full bg-black/20 px-3 py-2 text-fg-muted backdrop-blur-md md:hidden ${controlsVisible ? 'pointer-events-auto' : ''}`}>
-          🌡️
+          <ThermometerIcon />
           <input
             type="range"
             min={0}
