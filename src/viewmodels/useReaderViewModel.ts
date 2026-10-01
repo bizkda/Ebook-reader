@@ -90,10 +90,20 @@ const engineRef = useRef<ReaderEngine | null>(null);
   }, []);
 
   const [temperature, setTemperature] = useState(0); // 0–100, warmth only
-
+  const goToBookmark = useCallback(
+    (target: { page?: number | null; cfi?: string | null }) =>
+      engineRef.current?.goToLocation({
+        page: target.page ?? undefined,
+        cfi: target.cfi ?? undefined,
+      }),
+    [],
+  );
   return {
   attachContainer, location, loading, zoom, setZoom, nextPage, prevPage,
   darkMode, setDarkMode, temperature, setTemperature, contentClickTick,
-  isPdf: book.format === 'pdf', isEpub: book.format === 'epub'
-}
+  isPdf: book.format === 'pdf', isEpub: book.format === 'epub',
+  currentPage: location?.page ?? 1,
+  currentCfi: location?.cfi,
+  goToBookmark,
+};
 }

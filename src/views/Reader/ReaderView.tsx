@@ -3,6 +3,8 @@ import { useReaderViewModel } from '../../viewmodels/useReaderViewModel';
 import { Book } from '../../services/BookService';
 import { usePinchZoom } from '../../hooks/usePinchZoom';
 import { ZoomResetIcon } from '../../components/ZoomResetIcon';
+import { BookmarkView } from '../Bookmarks/Bookmark';
+import { Bookmark } from '../../services/BookmarkService';
 
 interface ReaderViewProps {
   book: Book;
@@ -13,9 +15,10 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
   const {
     attachContainer, loading, isPdf, zoom, setZoom, nextPage, prevPage,
     darkMode, setDarkMode, temperature, setTemperature,
-  contentClickTick} = useReaderViewModel(book);
+    contentClickTick, currentPage, currentCfi, goToBookmark,
+  } = useReaderViewModel(book);
 
-
+  const [showBookmarks, setShowBookmarks] = useState(false);
   const ZOOM_STEP = 0.1;
   const MIN_ZOOM = 0.5;
   const MAX_ZOOM = 5;
@@ -52,6 +55,7 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
     };
     animRef.current = requestAnimationFrame(step);
   };
+
   useEffect(() => {
     if (isFirstClick.current) {
       isFirstClick.current = false;
@@ -59,6 +63,7 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
     }
     setControlsVisible((v) => !v);
   }, [contentClickTick]);
+
   return (
     <div
       className="relative h-screen w-full overflow-hidden"
@@ -68,7 +73,6 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
         backgroundSize: '24px 24px',
       }}
     >
-      {/* Full-bleed reader surface, always full window */}
       {/* Full-bleed reader surface, always full window */}
       <div
         ref={viewerRef}
@@ -141,6 +145,13 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           >
             {darkMode ? '☀️' : '🌙'}
           </button>
+          <button
+            className="iconbtn backdrop-blur-md"
+            onClick={() => setShowBookmarks((s) => !s)}
+            aria-label="Bookmarks"
+          >
+            🔖
+          </button>
         </div>
       </div>
 
@@ -192,18 +203,18 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           </button>
 
           <input
-             type="number"
-              min={MIN_ZOOM * 100}
-              max={MAX_ZOOM * 100}
-              value={zoomDraft ?? Math.round(zoom * 100)}
-              onChange={(e) => setZoomDraft(e.target.value)}
-              onBlur={commitZoom}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  commitZoom();
-                  e.currentTarget.blur();
-                }
-              }}
+            type="number"
+            min={MIN_ZOOM * 100}
+            max={MAX_ZOOM * 100}
+            value={zoomDraft ?? Math.round(zoom * 100)}
+            onChange={(e) => setZoomDraft(e.target.value)}
+            onBlur={commitZoom}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                commitZoom();
+                e.currentTarget.blur();
+              }
+            }}
             aria-label="Zoom percentage"
             className="
               h-11 w-14
@@ -234,13 +245,13 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
             +
           </button>
           <button
-  className="iconbtn"
-  onClick={() => animateZoomTo(zoom > 1.05 ? 1 : 2)}
-  aria-label="Toggle zoom"
-  title="Zoom in / back to 100%"
->
-  <ZoomResetIcon />
-</button>
+            className="iconbtn"
+            onClick={() => animateZoomTo(zoom > 1.05 ? 1 : 2)}
+            aria-label="Toggle zoom"
+            title="Zoom in / back to 100%"
+          >
+            <ZoomResetIcon />
+          </button>
           <button className="iconbtn md:hidden" onClick={nextPage} aria-label={isPdf ? 'Next page' : 'Next chapter'}>
             ›
           </button>
@@ -260,6 +271,31 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           />
         </label>
       </div>
+
+      {/* Bookmarks panel — direct child of the root so it sizes against the screen */}
+      {showBookmarks && (
+        <>
+          <div
+            className="absolute inset-0 z-20 bg-[#1a1a1a]/40 backdrop-blur-[12px]"
+            onClick={() => setShowBookmarks(false)}
+          />
+          <aside
+            className="pointer-events-auto absolute inset-x-0 bottom-0 z-30 flex h-[85dvh] flex-col overflow-hidden rounded-t-[16px] bg-[#f7f4ef] shadow-[0_16px_40px_rgba(26,26,26,0.14)] md:inset-x-auto md:right-0 md:top-0 md:h-full md:w-[393px] md:rounded-none"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <BookmarkView
+              bookId={book.id}
+              currentPage={currentPage}
+              currentCfi={currentCfi}
+              onClose={() => setShowBookmarks(false)}
+              onSelect={(bookmark: Bookmark) => {
+                void goToBookmark(bookmark);
+                setShowBookmarks(false);
+              }}
+            />
+          </aside>
+        </>
+      )}
     </div>
   );
 }
