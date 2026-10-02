@@ -75,4 +75,5 @@ Phase 4: stability, because update bugs were a top complaint
  Consider F-Droid distribution, which fits open-source readers well
  Add accessibility basics: screen-reader labels, high contrast and large text
 
-If
+
+add a dashboard streak to help focus on reading
