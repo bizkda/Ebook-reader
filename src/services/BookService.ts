@@ -46,3 +46,6 @@ export async function getBook(id: string): Promise<Book | null> {
 export async function removeBook(id: string): Promise<void> {
   await invoke('delete_book', { id });
 }
+export async function setBookCover(id: string, coverPath: string): Promise<void> {
+  await invoke('set_book_cover', { id, coverPath });
+}

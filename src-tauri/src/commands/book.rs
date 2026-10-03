@@ -93,3 +93,18 @@ pub fn delete_book(state: State<DbState>, id: String) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     Ok(())
 }
+#[tauri::command]
+pub fn set_book_cover(
+    state: State<DbState>,
+    id: String,
+    cover_path: String,
+) -> Result<(), String> {
+    let conn = state.conn.lock().map_err(|e| e.to_string())?;
+    let now = chrono::Utc::now().to_rfc3339();
+    conn.execute(
+        "UPDATE books SET cover_path = ?1, updated_at = ?2 WHERE id = ?3",
+        params![cover_path, now, id],
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(())
+}

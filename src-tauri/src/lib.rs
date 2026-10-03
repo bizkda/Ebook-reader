@@ -22,6 +22,7 @@ pub fn run() {
             commands::book::list_books,
             commands::book::get_book,
             commands::book::delete_book,
+            commands::book::set_book_cover,
             commands::bookmark::add_bookmark,
             commands::bookmark::list_bookmarks,
             commands::bookmark::delete_bookmark,
@@ -29,7 +30,8 @@ pub fn run() {
             commands::progress::upsert_progress,
             commands::progress::get_progress,
             commands::progress::list_recently_read,
-            commands::progress::list_all_progress
+            commands::progress::list_all_progress,
+ 
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
