@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useReaderViewModel } from '../../viewmodels/useReaderViewModel';
 import { Book } from '../../services/BookService';
 import { usePinchZoom } from '../../hooks/usePinchZoom';
-import { ZoomResetIcon } from '../../components/ZoomResetIcon';
 import { IconButton } from '../../components/IconButton';
 import {
   ArrowLeftIcon,
@@ -270,14 +269,7 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           >
             <PlusIcon />
           </IconButton>
-          <IconButton
-            variant="reader"
-            onClick={() => animateZoomTo(zoom > 1.05 ? 1 : 2)}
-            aria-label="Toggle zoom"
-            title="Zoom in / back to 100%"
-          >
-            <ZoomResetIcon />
-          </IconButton>
+            
           <IconButton
             variant="reader"
             className="md:hidden"
