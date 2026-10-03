@@ -2,9 +2,9 @@
 use crate::db::DbState;
 use crate::models::book::{Book, NewBook};
 use rusqlite::params;
+use rusqlite::OptionalExtension;
 use tauri::State;
 use uuid::Uuid;
-use rusqlite::{OptionalExtension};
 
 #[tauri::command]
 pub fn add_book(state: State<DbState>, new: NewBook) -> Result<Book, String> {
@@ -58,7 +58,8 @@ pub fn list_books(state: State<DbState>) -> Result<Vec<Book>, String> {
         })
         .map_err(|e| e.to_string())?;
 
-    rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -94,11 +95,7 @@ pub fn delete_book(state: State<DbState>, id: String) -> Result<(), String> {
     Ok(())
 }
 #[tauri::command]
-pub fn set_book_cover(
-    state: State<DbState>,
-    id: String,
-    cover_path: String,
-) -> Result<(), String> {
+pub fn set_book_cover(state: State<DbState>, id: String, cover_path: String) -> Result<(), String> {
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
     let now = chrono::Utc::now().to_rfc3339();
     conn.execute(

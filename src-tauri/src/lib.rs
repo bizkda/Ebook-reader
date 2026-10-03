@@ -1,14 +1,15 @@
 // src-tauri/src/lib.rs
 use tauri::Manager;
+pub mod commands;
 pub mod db;
 pub mod models;
-pub mod commands;
 
 use db::init_db;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
@@ -31,7 +32,6 @@ pub fn run() {
             commands::progress::get_progress,
             commands::progress::list_recently_read,
             commands::progress::list_all_progress,
- 
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -5,7 +5,6 @@ use rusqlite::params;
 use tauri::State;
 use uuid::Uuid;
 
-
 #[tauri::command]
 pub fn add_bookmark(state: State<DbState>, new: NewBookmark) -> Result<Bookmark, String> {
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
@@ -56,7 +55,8 @@ pub fn list_bookmarks(state: State<DbState>, book_id: String) -> Result<Vec<Book
         })
         .map_err(|e| e.to_string())?;
 
-    rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

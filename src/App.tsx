@@ -1,8 +1,9 @@
 // src/App.tsx
 import { ReaderView } from './views/Reader/ReaderView';
-import { LibraryView } from './views/Library/LibraryView';
+import { Library} from './views/Library/Library';
 import { useLibraryViewModel } from './viewmodels/useLibraryViewModel';
 import './App.css';
+
 
 function App() {
   const library = useLibraryViewModel();
@@ -11,7 +12,7 @@ function App() {
     return <ReaderView book={library.activeBook} onClose={library.closeBook} />;
   }
 
-  return <LibraryView library={library} />;
+  return <Library library={library} />;
 }
 
 export default App;

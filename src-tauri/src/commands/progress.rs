@@ -5,7 +5,10 @@ use rusqlite::{params, OptionalExtension};
 use tauri::State;
 
 #[tauri::command]
-pub fn upsert_progress(state: State<DbState>, update: UpdateProgress) -> Result<ReadingProgress, String> {
+pub fn upsert_progress(
+    state: State<DbState>,
+    update: UpdateProgress,
+) -> Result<ReadingProgress, String> {
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
     let now = chrono::Utc::now().to_rfc3339();
 
@@ -33,7 +36,10 @@ pub fn upsert_progress(state: State<DbState>, update: UpdateProgress) -> Result<
 }
 
 #[tauri::command]
-pub fn get_progress(state: State<DbState>, book_id: String) -> Result<Option<ReadingProgress>, String> {
+pub fn get_progress(
+    state: State<DbState>,
+    book_id: String,
+) -> Result<Option<ReadingProgress>, String> {
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
     conn.query_row(
         "SELECT book_id, current_page, current_cfi, percentage, last_read_at, updated_at
@@ -55,7 +61,10 @@ pub fn get_progress(state: State<DbState>, book_id: String) -> Result<Option<Rea
 }
 
 #[tauri::command]
-pub fn list_recently_read(state: State<DbState>, limit: i64) -> Result<Vec<ReadingProgress>, String> {
+pub fn list_recently_read(
+    state: State<DbState>,
+    limit: i64,
+) -> Result<Vec<ReadingProgress>, String> {
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
     let mut stmt = conn
         .prepare(
@@ -80,7 +89,8 @@ pub fn list_recently_read(state: State<DbState>, limit: i64) -> Result<Vec<Readi
         })
         .map_err(|e| e.to_string())?;
 
-    rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())
 }
 // add to src-tauri/src/commands/progress.rs
 #[tauri::command]
@@ -106,5 +116,6 @@ pub fn list_all_progress(state: State<DbState>) -> Result<Vec<ReadingProgress>, 
         })
         .map_err(|e| e.to_string())?;
 
-    rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())
 }

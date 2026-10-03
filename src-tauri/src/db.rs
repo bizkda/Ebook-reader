@@ -51,7 +51,10 @@ CREATE INDEX IF NOT EXISTS idx_bookmarks_book ON bookmarks(book_id);
 ";
 
 pub fn init_db(app: &tauri::App) -> DbState {
-    let data_dir = app.path().app_data_dir().expect("could not resolve app data dir");
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .expect("could not resolve app data dir");
     std::fs::create_dir_all(&data_dir).expect("failed to create app data dir");
 
     let db_path = data_dir.join("library.db");
@@ -59,14 +62,32 @@ pub fn init_db(app: &tauri::App) -> DbState {
     conn.execute_batch(SCHEMA).expect("failed to run schema");
 
     // Migrations for existing databases (safe no-ops if columns already exist)
-    let _ = conn.execute("ALTER TABLE books ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''", []);
-    let _ = conn.execute("ALTER TABLE reading_progress ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''", []);
-    let _ = conn.execute("ALTER TABLE bookmarks ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''", []);
+    let _ = conn.execute(
+        "ALTER TABLE books ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''",
+        [],
+    );
+    let _ = conn.execute(
+        "ALTER TABLE reading_progress ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''",
+        [],
+    );
+    let _ = conn.execute(
+        "ALTER TABLE bookmarks ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''",
+        [],
+    );
 
     let now = chrono::Utc::now().to_rfc3339();
-    let _ = conn.execute("UPDATE books SET updated_at = ?1 WHERE updated_at = ''", [&now]);
-    let _ = conn.execute("UPDATE reading_progress SET updated_at = ?1 WHERE updated_at = ''", [&now]);
-    let _ = conn.execute("UPDATE bookmarks SET updated_at = ?1 WHERE updated_at = ''", [&now]);
+    let _ = conn.execute(
+        "UPDATE books SET updated_at = ?1 WHERE updated_at = ''",
+        [&now],
+    );
+    let _ = conn.execute(
+        "UPDATE reading_progress SET updated_at = ?1 WHERE updated_at = ''",
+        [&now],
+    );
+    let _ = conn.execute(
+        "UPDATE bookmarks SET updated_at = ?1 WHERE updated_at = ''",
+        [&now],
+    );
 
     DbState {
         conn: Arc::new(Mutex::new(conn)),

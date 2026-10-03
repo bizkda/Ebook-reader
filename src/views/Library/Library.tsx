@@ -1,28 +1,25 @@
-// src/views/Library/LibraryView.tsx
-import { convertFileSrc } from '@tauri-apps/api/core';
+// src/views/Library/Library.tsx
 import type { useLibraryViewModel } from '../../viewmodels/useLibraryViewModel';
 import { Icon } from '../../components/Icon';
 import { IconButton } from '../../components/IconButton';
 import { Button } from '../../components/Button';
 import { CloseIcon } from '../../components/icons';
-
+import { BookCard } from './Books';
+import cover from '../../assets/cover.jpg';
 type Props = { library: ReturnType<typeof useLibraryViewModel> };
 
-
-export function LibraryView({ library }: Props) {
+export function Library({ library }: Props) {
   const term = library.query.trim();
+
   return (
     <main
-      className="min-h-screen w-full"
-      style={{
-        backgroundColor: 'var(--color-canvas)',
-        backgroundImage: 'radial-gradient(rgba(26,26,26,0.045) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
-      }}
-    >
-      <div className="mx-auto flex w-full max-w-[640px] flex-col gap-6 px-4 pb-10 pt-12 md:max-w-[720px] md:gap-8 md:px-0 md:pt-16">
-        {/* Update banner */}
-        {library.updateInfo && (
+  className="min-h-screen w-full bg-cover bg-center bg-no-repeat md:bg-fixed"
+  style={{
+    backgroundColor: 'var(--color-canvas)',
+    backgroundImage: `linear-gradient(rgba(247,244,239,0.25), rgba(247,244,239,0.25)), url(${cover})`,
+  }}
+>
+        <div className="mx-auto flex w-full max-w-[640px] flex-col gap-6 px-4 pb-10 pt-12 md:max-w-[720px] md:gap-8 md:px-6 md:pt-16 lg:max-w-[1120px] xl:max-w-[1400px] 2xl:max-w-[1680px]">        {library.updateInfo && (
           <div
             className="flex items-center justify-between gap-3 rounded-md px-4 py-3 text-[13px] md:rounded-lg md:text-[15px]"
             style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-primary)' }}
@@ -111,51 +108,20 @@ export function LibraryView({ library }: Props) {
                 Nothing matches “{library.query}”.
               </p>
             ) : (
-              <section className="shelf" aria-label="Your books">
-                {library.visibleBooks.map((book) => {
-                  const pct = library.progressById[book.id];
-                  return (
-                    <div key={book.id} className="book-row group">
-                      <button className="book-row-main" onClick={() => library.openBook(book)}>
-                        {book.cover_path ? (
-                          <img
-                            className="book-cover book-cover-img"
-                            src={convertFileSrc(book.cover_path)}
-                            alt=""
-                            aria-hidden="true"
-                          />
-                        ) : (
-                          <span
-                            className="book-cover"
-                            style={{
-                              background:
-                                'linear-gradient(160deg, color-mix(in srgb, var(--color-primary) 55%, var(--color-surface-recessed)), var(--color-surface-recessed))',
-                            }}
-                            aria-hidden="true"
-                          >
-                            <span className="book-cover-letter">
-                              {book.title.charAt(0).toUpperCase()}
-                            </span>
-                          </span>
-                        )}
-                        <span className="book-text">
-                          <span className="book-title">{book.title}</span>
-                          {book.author && <span className="book-meta">{book.author}</span>}
-                        </span>
-                        <span className="book-pct">
-                          {pct !== undefined ? `${Math.round(pct * 100)}%` : '—'}
-                        </span>
-                      </button>
-                      <IconButton
-                        className="book-remove"
-                        onClick={() => library.removeBook(book.id)}
-                        aria-label={`Remove ${book.title}`}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                    </div>
-                  );
-                })}
+              <section
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+                aria-label="Your books"
+              >      
+              {library.visibleBooks.map((book, i) => (
+                  <BookCard
+                    key={book.id}
+                    book={book}
+                    progress={library.progressById[book.id]}
+                    index={i}
+                    onOpen={library.openBook}
+                    onRemove={library.removeBook}
+                  />
+                ))}
               </section>
             )}
 
