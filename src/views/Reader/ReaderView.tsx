@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useReaderViewModel } from '../../viewmodels/useReaderViewModel';
 import { Book } from '../../services/BookService';
 import { usePinchZoom } from '../../hooks/usePinchZoom';
+import { ZoomResetIcon } from '../../components/ZoomResetIcon';
 import { IconButton } from '../../components/IconButton';
 import {
   ArrowLeftIcon,
@@ -13,6 +14,8 @@ import {
   PlusIcon,
   SunIcon,
   ThermometerIcon,
+  ZoomIcon
+
 } from '../../components/icons';
 import { BookmarkView } from '../Bookmarks/Bookmark';
 import { Bookmark } from '../../services/BookmarkService';
@@ -26,13 +29,18 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
   const {
     attachContainer, loading, isPdf, zoom, setZoom, nextPage, prevPage,
     darkMode, setDarkMode, temperature, setTemperature,
-    contentClickTick, currentPage, currentCfi, goToBookmark,
+    contentClickTick, currentPage, currentCfi, goToBookmark, location,
   } = useReaderViewModel(book);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const ZOOM_STEP = 0.1;
   const MIN_ZOOM = 0.5;
   const MAX_ZOOM = 5;
   const overlayOpacity = (temperature / 100) * 0.4;
+  const progressPct = Math.round((location?.percentage ?? 0) * 100);
+  const zoomToSlider = (z: number) =>
+  (Math.log(z / MIN_ZOOM) / Math.log(MAX_ZOOM / MIN_ZOOM)) * 100;
+const sliderToZoom = (v: number) =>
+  MIN_ZOOM * Math.pow(MAX_ZOOM / MIN_ZOOM, v / 100);
 
   const toggleControls = () => setControlsVisible((v) => !v);
   const [zoomDraft, setZoomDraft] = useState<string | null>(null);
@@ -74,6 +82,11 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
     setControlsVisible((v) => !v);
   }, [contentClickTick]);
 
+  // shared by both side pills: fade with the other controls
+  const sideVisibility = controlsVisible
+    ? 'pointer-events-auto opacity-100'
+    : 'pointer-events-none opacity-0';
+
   return (
     <div
       className="relative h-screen w-full overflow-hidden"
@@ -113,47 +126,18 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
         <div className={`flex min-w-0 items-center gap-3 pb-4 md:gap-4 ${controlsVisible ? 'pointer-events-auto' : ''}`}>
           <IconButton
             variant="reader"
-            className="hidden shrink-0 backdrop-blur-md md:inline-flex"
+            className="shrink-0 backdrop-blur-md"
             onClick={onClose}
             aria-label="Back to library"
           >
             <ArrowLeftIcon />
           </IconButton>
-          <div className="flex min-w-0 flex-col gap-1">
-            <span className="block truncate text-[13px] uppercase tracking-[0.08em] text-fg-muted">
-              {book.title}
-            </span>
-            <span className="font-display text-[17px] leading-[22px] md:text-[22px] md:leading-[26px]">
-              page {currentPage}
-            </span>
-          </div>
+          <span className="block truncate text-[13px] uppercase tracking-[0.08em] text-fg-muted">
+            {book.title}
+          </span>
         </div>
 
         <div className={`flex shrink-0 items-center gap-2 pb-4 md:gap-4 ${controlsVisible ? 'pointer-events-auto' : ''}`}>
-          <div className="hidden items-center gap-3 md:flex">
-            <label className="flex items-center gap-2 rounded-full bg-black/20 px-3 py-1.5 text-fg-muted backdrop-blur-md">
-              <ThermometerIcon />
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={temperature}
-                onChange={(e) => setTemperature(Number(e.target.value))}
-                aria-label="Warmth"
-                className="w-[140px] accent-primary"
-              />
-            </label>
-            <span className="pill backdrop-blur-md">{Math.round(zoom * 100)}%</span>
-          </div>
-
-          <IconButton
-            variant="reader"
-            className="backdrop-blur-md md:hidden"
-            onClick={onClose}
-            aria-label="Back to library"
-          >
-            <ArrowLeftIcon />
-          </IconButton>
           <IconButton
             variant="reader"
             className="backdrop-blur-md"
@@ -170,6 +154,53 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           >
             <BookmarkIcon />
           </IconButton>
+        </div>
+      </div>
+
+      {/* Left side: warmth (vertical slider) */}
+      <div
+        className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200 md:left-4 md:top-[30%] ${sideVisibility}`}
+      >
+        <div className="flex flex-col items-center gap-3 rounded-full bg-black/25 px-1.5 py-4 text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.18)] backdrop-blur-md">
+          <ThermometerIcon />
+          <div className="relative h-32 w-8">
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={temperature}
+              onChange={(e) => setTemperature(Number(e.target.value))}
+              aria-label="Warmth"
+              className="absolute left-1/2 top-1/2 w-32 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-primary"
+            />
+          </div>
+        </div>
+      </div>
+
+      
+     {/* Right side: zoom (vertical slider) */}
+      <div
+        className={`absolute right-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200 md:right-4 md:top-[30%] ${sideVisibility}`}
+      >
+        <div className="flex flex-col items-center gap-3 rounded-full bg-black/25 px-1.5 py-4 text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.18)] backdrop-blur-md">
+          <span title={`${Math.round(zoom * 100)}%`}>
+            <ZoomIcon />
+          </span>
+
+          <div className="relative h-32 w-8">
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={0.5}
+              value={zoomToSlider(zoom)}
+              onChange={(e) => setZoom(sliderToZoom(Number(e.target.value)))}
+              aria-label="Zoom"
+              aria-valuetext={`${Math.round(zoom * 100)}%`}
+              className="absolute left-1/2 top-1/2 w-32 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-primary"
+            />
+          </div>
+
         </div>
       </div>
 
@@ -201,16 +232,20 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
         <ChevronRightIcon />
       </IconButton>
 
-      {/* Bottom chrome — floating, transparent, fades in/out */}
+      {/* Bottom chrome — page indicator */}
       <div
-        className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-3 px-4 pb-6 pt-10 transition-opacity duration-200 md:flex-row md:items-center md:justify-center md:px-10 md:pb-10 ${
+        className={`pointer-events-none absolute inset-x-0 bottom-0 flex justify-center px-4 pb-6 pt-10 transition-opacity duration-200 md:pb-10 ${
           controlsVisible ? 'opacity-100' : 'opacity-0'
         }`}
         style={{
           background: 'linear-gradient(to top, rgba(0,0,0,0.35), transparent)',
         }}
       >
-        <div className={`tools mx-auto rounded-full bg-black/20 backdrop-blur-md md:gap-3 ${controlsVisible ? 'pointer-events-auto' : ''}`}>
+        <div
+          className={`flex items-center gap-1 rounded-full bg-black/25 p-1.5 shadow-[0_4px_16px_rgba(0,0,0,0.18)] backdrop-blur-md ${
+            controlsVisible ? 'pointer-events-auto' : ''
+          }`}
+        >
           <IconButton
             variant="reader"
             className="md:hidden"
@@ -219,57 +254,25 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
           >
             <ChevronLeftIcon />
           </IconButton>
-          <IconButton
-            variant="reader"
-            onClick={() => setZoom(Math.max(MIN_ZOOM, zoom - ZOOM_STEP))}
-            aria-label="Zoom out"
-          >
-            <MinusIcon />
-          </IconButton>
 
-          <input
-            type="number"
-            min={MIN_ZOOM * 100}
-            max={MAX_ZOOM * 100}
-            value={zoomDraft ?? Math.round(zoom * 100)}
-            onChange={(e) => setZoomDraft(e.target.value)}
-            onBlur={commitZoom}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                commitZoom();
-                e.currentTarget.blur();
-              }
-            }}
-            aria-label="Zoom percentage"
-            className="
-              h-11 w-14
-              rounded-full
-              border-0
-              bg-transparent
-              px-0
-              text-center
-              text-[13px]
-              text-fg-muted
-              outline-none
-              transition
-              hover:bg-surface-elevated
-              focus:bg-surface-elevated
-              focus:ring-2
-              focus:ring-fg
-              [appearance:textfield]
-              [&::-webkit-inner-spin-button]:appearance-none
-              [&::-webkit-outer-spin-button]:appearance-none
-            "
-          />
-
-          <IconButton
-            variant="reader"
-            onClick={() => setZoom(Math.min(MAX_ZOOM, zoom + ZOOM_STEP))}
-            aria-label="Zoom in"
+          <div
+            className="flex min-w-[104px] flex-col items-center gap-1 px-3 leading-none md:px-5"
+            aria-live="polite"
           >
-            <PlusIcon />
-          </IconButton>
-            
+            <span className="font-display text-[18px] font-medium tabular-nums">
+              {isPdf ? currentPage : `${progressPct}%`}
+            </span>
+            <span className="text-[11px] uppercase tracking-[0.08em] text-fg-muted">
+              {isPdf ? (book.total_pages ? `of ${book.total_pages}` : 'page') : 'read'}
+            </span>
+            <span className="mt-0.5 block h-[3px] w-full overflow-hidden rounded-full bg-white/25">
+              <span
+                className="block h-full rounded-full bg-white transition-[width] duration-200"
+                style={{ width: `${progressPct}%` }}
+              />
+            </span>
+          </div>
+
           <IconButton
             variant="reader"
             className="md:hidden"
@@ -279,20 +282,6 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
             <ChevronRightIcon />
           </IconButton>
         </div>
-
-        {/* Phone-only warmth slider */}
-        <label className={`flex items-center gap-2 rounded-full bg-black/20 px-3 py-2 text-fg-muted backdrop-blur-md md:hidden ${controlsVisible ? 'pointer-events-auto' : ''}`}>
-          <ThermometerIcon />
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={temperature}
-            onChange={(e) => setTemperature(Number(e.target.value))}
-            aria-label="Warmth"
-            className="w-full accent-primary"
-          />
-        </label>
       </div>
 
       {/* Bookmarks panel — direct child of the root so it sizes against the screen */}

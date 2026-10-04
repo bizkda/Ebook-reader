@@ -70,3 +70,11 @@ export const ThermometerIcon = () => (
     <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" />
   </Icon>
 );
+export const ZoomIcon = () => (
+  <Icon>
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.3-4.3" />
+    <path d="M11 8v6" />
+    <path d="M8 11h6" />
+  </Icon>
+);
