@@ -2,16 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useReaderViewModel } from '../../viewmodels/useReaderViewModel';
 import { Book } from '../../services/BookService';
 import { usePinchZoom } from '../../hooks/usePinchZoom';
-import { ZoomResetIcon } from '../../components/ZoomResetIcon';
 import { IconButton } from '../../components/IconButton';
 import {
   ArrowLeftIcon,
   BookmarkIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  MinusIcon,
   MoonIcon,
-  PlusIcon,
   SunIcon,
   ThermometerIcon,
   ZoomIcon
@@ -32,7 +29,6 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
     contentClickTick, currentPage, currentCfi, goToBookmark, location,
   } = useReaderViewModel(book);
   const [showBookmarks, setShowBookmarks] = useState(false);
-  const ZOOM_STEP = 0.1;
   const MIN_ZOOM = 0.5;
   const MAX_ZOOM = 5;
   const overlayOpacity = (temperature / 100) * 0.4;
@@ -43,36 +39,16 @@ const sliderToZoom = (v: number) =>
   MIN_ZOOM * Math.pow(MAX_ZOOM / MIN_ZOOM, v / 100);
 
   const toggleControls = () => setControlsVisible((v) => !v);
-  const [zoomDraft, setZoomDraft] = useState<string | null>(null);
 
-  const commitZoom = () => {
-    if (zoomDraft === null) return;
-    const value = Number(zoomDraft);
-    if (!Number.isNaN(value) && zoomDraft.trim() !== '') {
-      setZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value / 100)));
-    }
-    setZoomDraft(null);
-  };
+
+ 
   const [controlsVisible, setControlsVisible] = useState(true);
   const isFirstClick = useRef(true);
   const viewerRef = useRef<HTMLDivElement>(null);
   usePinchZoom(viewerRef, zoom, setZoom, MIN_ZOOM, MAX_ZOOM);
-  const animRef = useRef(0);
 
-  const animateZoomTo = (target: number) => {
-    cancelAnimationFrame(animRef.current);
-    const from = zoom;
-    const start = performance.now();
-    const duration = 250; // ms
 
-    const step = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3); // ease-out, feels like a natural glide
-      setZoom(from + (target - from) * eased);
-      if (t < 1) animRef.current = requestAnimationFrame(step);
-    };
-    animRef.current = requestAnimationFrame(step);
-  };
+  
 
   useEffect(() => {
     if (isFirstClick.current) {
