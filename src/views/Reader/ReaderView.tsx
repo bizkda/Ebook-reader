@@ -135,7 +135,7 @@ const sliderToZoom = (v: number) =>
 
       {/* Left side: warmth (vertical slider) */}
       <div
-        className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200 md:left-4 md:top-[30%] ${sideVisibility}`}
+        className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200 ${sideVisibility}`}
       >
         <div className="flex flex-col items-center gap-3 rounded-full bg-black/25 px-1.5 py-4 text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.18)] backdrop-blur-md">
           <ThermometerIcon />
@@ -156,7 +156,7 @@ const sliderToZoom = (v: number) =>
       
      {/* Right side: zoom (vertical slider) */}
       <div
-        className={`absolute right-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200 md:right-4 md:top-[30%] ${sideVisibility}`}
+        className={`absolute right-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200  ${sideVisibility}`}
       >
         <div className="flex flex-col items-center gap-3 rounded-full bg-black/25 px-1.5 py-4 text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.18)] backdrop-blur-md">
           <span title={`${Math.round(zoom * 100)}%`}>
@@ -180,34 +180,6 @@ const sliderToZoom = (v: number) =>
         </div>
       </div>
 
-      {/* Desktop page-turn rails — floating over the page */}
-      <IconButton
-        variant="reader"
-        className={`pointer-events-auto absolute left-4 top-1/2 hidden -translate-y-1/2 backdrop-blur-md transition-opacity duration-200 md:inline-flex ${
-          controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={(e) => {
-          e.stopPropagation();
-          prevPage();
-        }}
-        aria-label={isPdf ? 'Prev page' : 'Prev chapter'}
-      >
-        <ChevronLeftIcon />
-      </IconButton>
-      <IconButton
-        variant="reader"
-        className={`pointer-events-auto absolute right-4 top-1/2 hidden -translate-y-1/2 backdrop-blur-md transition-opacity duration-200 md:inline-flex ${
-          controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={(e) => {
-          e.stopPropagation();
-          nextPage();
-        }}
-        aria-label={isPdf ? 'Next page' : 'Next chapter'}
-      >
-        <ChevronRightIcon />
-      </IconButton>
-
       {/* Bottom chrome — page indicator */}
       <div
         className={`pointer-events-none absolute inset-x-0 bottom-0 flex justify-center px-4 pb-6 pt-10 transition-opacity duration-200 md:pb-10 ${
@@ -224,7 +196,6 @@ const sliderToZoom = (v: number) =>
         >
           <IconButton
             variant="reader"
-            className="md:hidden"
             onClick={prevPage}
             aria-label={isPdf ? 'Prev page' : 'Prev chapter'}
           >
@@ -251,7 +222,6 @@ const sliderToZoom = (v: number) =>
 
           <IconButton
             variant="reader"
-            className="md:hidden"
             onClick={nextPage}
             aria-label={isPdf ? 'Next page' : 'Next chapter'}
           >

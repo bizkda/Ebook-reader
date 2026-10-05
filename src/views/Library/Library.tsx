@@ -5,7 +5,7 @@ import { IconButton } from '../../components/IconButton';
 import { Button } from '../../components/Button';
 import { CloseIcon } from '../../components/icons';
 import { BookCard } from './Books';
-import cover from '../../assets/cover.jpg';
+import cover from '../../assets/cover.webp';
 type Props = { library: ReturnType<typeof useLibraryViewModel> };
 
 export function Library({ library }: Props) {
