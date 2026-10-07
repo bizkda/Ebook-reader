@@ -92,7 +92,7 @@ const sliderToZoom = (v: number) =>
 
       {/* Top bar — floating, transparent, fades in/out */}
       <div
-        className={`pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-6 px-4 pt-8 transition-opacity duration-200 md:px-10 ${
+        className={`pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-6 px-4 pt-8 transition-opacity duration-200  ${
           controlsVisible ? 'opacity-100' : 'opacity-0'
         }`}
         style={{
@@ -134,51 +134,76 @@ const sliderToZoom = (v: number) =>
       </div>
 
       {/* Left side: warmth (vertical slider) */}
-      <div
-        className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200 ${sideVisibility}`}
-      >
-        <div className="flex flex-col items-center gap-3 rounded-full bg-black/25 px-1.5 py-4 text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.18)] backdrop-blur-md">
-          <ThermometerIcon />
-          <div className="relative h-32 w-8">
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={temperature}
-              onChange={(e) => setTemperature(Number(e.target.value))}
-              aria-label="Warmth"
-              className="absolute left-1/2 top-1/2 w-32 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-primary"
-            />
-          </div>
-        </div>
+     {/* Left side: warmth */}
+<div
+  className={`absolute left-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200 ${sideVisibility}`}
+>
+  <div className="flex flex-col items-center gap-2 rounded-full bg-black/25 px-1.5 py-3 text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.18)] backdrop-blur-md
+                  max-[700px]:gap-1.5 max-[700px]:py-2"
+  >
+    <div className="scale-75 min-[700px]:scale-100">
+      <ThermometerIcon />
+    </div>
+
+    <div className="relative h-24 w-6 min-[700px]:h-32 min-[700px]:w-8">
+      <input
+        type="range"
+        min={0}
+        max={100}
+        value={temperature}
+        onChange={(e) => setTemperature(Number(e.target.value))}
+        aria-label="Warmth"
+        className="absolute left-1/2 top-1/2 w-24 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-primary min-[700px]:w-32"
+      />
+    </div>
+  </div>
+</div>
+
+
+{/* Right side: zoom */}
+<div
+  className={`absolute right-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200 ${sideVisibility}`}
+>
+  <div
+    className="
+      flex flex-col items-center gap-3 rounded-full
+      bg-black/25 px-1.5 py-4 text-white/80
+      shadow-[0_4px_16px_rgba(0,0,0,0.18)]
+      backdrop-blur-md
+
+      max-[700px]:gap-1.5
+      max-[700px]:py-2
+    "
+  >
+    <span title={`${Math.round(zoom * 100)}%`}>
+      <div className="scale-75 min-[700px]:scale-100">
+        <ZoomIcon />
       </div>
+    </span>
 
-      
-     {/* Right side: zoom (vertical slider) */}
-      <div
-        className={`absolute right-3 top-1/2 z-10 -translate-y-1/2 transition-opacity duration-200  ${sideVisibility}`}
-      >
-        <div className="flex flex-col items-center gap-3 rounded-full bg-black/25 px-1.5 py-4 text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.18)] backdrop-blur-md">
-          <span title={`${Math.round(zoom * 100)}%`}>
-            <ZoomIcon />
-          </span>
+    <div className="relative h-24 w-6 min-[700px]:h-32 min-[700px]:w-8">
+      <input
+        type="range"
+        min={0}
+        max={100}
+        step={0.5}
+        value={zoomToSlider(zoom)}
+        onChange={(e) => setZoom(sliderToZoom(Number(e.target.value)))}
+        aria-label="Zoom"
+        aria-valuetext={`${Math.round(zoom * 100)}%`}
+        className="
+          absolute left-1/2 top-1/2
+          w-24
+          -translate-x-1/2 -translate-y-1/2
+          -rotate-90
+          accent-primary
+          min-[700px]:w-32
+        "
+      />
+    </div>
+  </div>
+</div>
 
-          <div className="relative h-32 w-8">
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={0.5}
-              value={zoomToSlider(zoom)}
-              onChange={(e) => setZoom(sliderToZoom(Number(e.target.value)))}
-              aria-label="Zoom"
-              aria-valuetext={`${Math.round(zoom * 100)}%`}
-              className="absolute left-1/2 top-1/2 w-32 -translate-x-1/2 -translate-y-1/2 -rotate-90 accent-primary"
-            />
-          </div>
-
-        </div>
-      </div>
 
       {/* Bottom chrome — page indicator */}
       <div
@@ -207,11 +232,9 @@ const sliderToZoom = (v: number) =>
             aria-live="polite"
           >
             <span className="font-display text-[18px] font-medium tabular-nums">
-              {isPdf ? currentPage : `${progressPct}%`}
+              {isPdf ? currentPage : ``}
             </span>
-            <span className="text-[11px] uppercase tracking-[0.08em] text-fg-muted">
-              {isPdf ? (book.total_pages ? `of ${book.total_pages}` : 'page') : 'read'}
-            </span>
+           
             <span className="mt-0.5 block h-[3px] w-full overflow-hidden rounded-full bg-white/25">
               <span
                 className="block h-full rounded-full bg-white transition-[width] duration-200"
