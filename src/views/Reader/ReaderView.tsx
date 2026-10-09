@@ -186,7 +186,7 @@ const sliderToZoom = (v: number) =>
         type="range"
         min={0}
         max={100}
-        step={0.5}
+        step={0.1}
         value={zoomToSlider(zoom)}
         onChange={(e) => setZoom(sliderToZoom(Number(e.target.value)))}
         aria-label="Zoom"
