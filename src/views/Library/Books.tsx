@@ -8,12 +8,13 @@ const DISPLAY = 'font-[family-name:var(--font-blob-display)]';
 const BODY = 'font-[family-name:var(--font-blob-body)]';
 
 function BookCover({ book }: { book: Book }) {
-  if (book.cover_path) {
+   if (book.cover_path) {
     return (
       <img
         src={convertFileSrc(book.cover_path)}
         alt=""
         aria-hidden="true"
+        loading="lazy"
         className="aspect-[3/3] w-full rounded-[16px] object-cover object-top outline outline-1 -outline-offset-1 outline-black/5"
       />
     );

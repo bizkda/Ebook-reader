@@ -6,11 +6,11 @@ import { Button } from '../../components/Button';
 import { CloseIcon } from '../../components/icons';
 import { BookCard } from './Books';
 import cover from '../../assets/cover.webp';
+
 type Props = { library: ReturnType<typeof useLibraryViewModel> };
 
 export function Library({ library }: Props) {
   const term = library.query.trim();
-
   return (
     <main
   className="min-h-screen w-full bg-cover bg-center bg-no-repeat md:bg-fixed"
