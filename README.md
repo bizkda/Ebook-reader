@@ -16,7 +16,7 @@ A fast, native ebook reader you can launch with one click — built with Tauri.
 
 | Library (empty) | Library |
 | --- | --- |
-| ![Empty library state](docs/screenshots/Screenshot_2026-09-19-223929.png) | ![Library with a book](docs/screenshots/Screenshot_2026-09-19-224012.png) |
+| ![Empty library state](docs/screenshots/Screenshot_2026-10-22-220651.png) | ![Library with a book](docs/screenshots/Screenshot_2026-10-22-220015.png) |
 
 | Reading view | Reading view (compact) |
 | --- | --- |
