@@ -49,22 +49,8 @@ export function ReaderView({ book, onClose }: ReaderViewProps) {
   const isFirstClick = useRef(true);
   const viewerRef = useRef<HTMLDivElement>(null);
   usePinchZoom(viewerRef, zoom, setZoom, MIN_ZOOM, MAX_ZOOM);
-  const animRef = useRef(0);
 
-  const animateZoomTo = (target: number) => {
-    cancelAnimationFrame(animRef.current);
-    const from = zoom;
-    const start = performance.now();
-    const duration = 250; // ms
 
-    const step = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3); // ease-out, feels like a natural glide
-      setZoom(from + (target - from) * eased);
-      if (t < 1) animRef.current = requestAnimationFrame(step);
-    };
-    animRef.current = requestAnimationFrame(step);
-  };
 
   useEffect(() => {
     if (isFirstClick.current) {
