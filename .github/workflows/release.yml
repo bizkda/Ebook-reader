@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+
 permissions:
   contents: write
 
@@ -32,7 +33,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
   build-macos:
     runs-on: macos-latest
     steps:
@@ -59,8 +59,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
-
   build-linux:
     runs-on: ubuntu-22.04
     steps:
@@ -82,23 +80,45 @@ jobs:
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^2.0.0"
 
-      - run: cargo tauri build
+      - name: Build
+        run: cargo tauri build
+        env:
+          NO_STRIP: "true"
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+
+      - name: Debug bundle output
+        run: |
+          find . -path ./node_modules -prune -o -type d -name bundle -print
+          find . -path ./node_modules -prune -o \( -name "*.AppImage" -o -name "*.deb" \) -print
+          ls -la ~/.cache/tauri || true
 
       - name: Fix AppImage permissions
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: "1"
         run: |
-          cd src-tauri/target/release/bundle/appimage
-          APPIMAGE=$(ls *.AppImage | head -n 1)
+          APPIMAGE_PATH=$(find . -path ./node_modules -prune -o -name "*.AppImage" -print | head -n 1)
+          test -n "$APPIMAGE_PATH" || { echo "No AppImage found"; exit 1; }
+          cd "$(dirname "$APPIMAGE_PATH")"
+          APPIMAGE=$(basename "$APPIMAGE_PATH")
+
+          TOOL=~/.cache/tauri/appimagetool-x86_64.AppImage
+          if [ ! -x "$TOOL" ]; then
+            mkdir -p ~/.cache/tauri
+            wget -q -O "$TOOL" https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+            chmod +x "$TOOL"
+          fi
+
           chmod +x "$APPIMAGE"
           ./"$APPIMAGE" --appimage-extract
           chmod -R a+rX squashfs-root
-          chmod a+x squashfs-root/AppRun squashfs-root/AppRun.wrapped
-          ARCH=x86_64 ~/.cache/tauri/appimagetool-x86_64.AppImage squashfs-root "$APPIMAGE"
+          chmod a+x squashfs-root/AppRun*
+          ARCH=x86_64 "$TOOL" squashfs-root "$APPIMAGE"
           rm -rf squashfs-root
 
       - uses: softprops/action-gh-release@v2
         with:
           files: |
-            src-tauri/target/release/bundle/deb/*.deb
-            src-tauri/target/release/bundle/appimage/*.AppImage
+            **/release/bundle/deb/*.deb
+            **/release/bundle/appimage/*.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
